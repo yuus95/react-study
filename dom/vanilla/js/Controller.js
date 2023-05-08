@@ -10,6 +10,7 @@ export default class Controller {
             searchResultView,
             tabView,
             keywordListView,
+            historyListView,
         }
     ) {
         console.log(tag, "constructor");
@@ -18,6 +19,7 @@ export default class Controller {
         this.searchResultView = searchResultView;
         this.tabView = tabView;
         this.keywordListView = keywordListView;
+        this.historyListView = historyListView;
 
         this.subscribeViewEvents();
         this.render();
@@ -33,6 +35,7 @@ export default class Controller {
 
         this.tabView.on("@change", (event) => this.changeTab(event.detail.value));
         this.keywordListView.on("@click", (event) => this.search(event.detail.value));
+        this.historyListView.on("@click", (event) => this.search(event.detail.value));
     }
 
     search(keyword) {
@@ -57,17 +60,21 @@ export default class Controller {
         this.searchResultView.hide();
 
         if (this.store.selectedTab == TabType.KEYWORD) {
-            this.keywordListView.show(this.store.keywordList())
+            this.keywordListView.show(this.store.getKeywordList())
+            this.historyListView.hide();
         } else if (this.store.selectedTab == TabType.HISTORY) {
             console.log("History")
             this.keywordListView.hide();
+            this.historyListView.show(this.store.getHistoryList());
+        } else {
+            throw "error Souce"
         }
     }
 
     renderSearchResult() {
         this.tabView.hide();
         this.keywordListView.hide();
-
+        this.historyListView.hide();
         this.searchFormView.show(this.store.searchKeyword);
         this.searchResultView.show(this.store.searchResult);
     }

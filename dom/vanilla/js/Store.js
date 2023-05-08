@@ -1,4 +1,5 @@
 import {TabType} from "./views/TabView.js"
+
 const tag = "[Store]";
 
 export default class Store {
@@ -22,7 +23,11 @@ export default class Store {
         );
     }
 
-    keywordList(){
+    getKeywordList() {
         return this.storage.keywordData;
+    }
+
+    getHistoryList() {
+        return this.storage.historyData;
     }
 }
