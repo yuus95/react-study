@@ -1,4 +1,4 @@
-import {qs} from "../helpers.js";
+import {delegate,  qs, qsAll} from "../helpers.js";
 import View from "./View.js";
 
 /**
@@ -12,7 +12,7 @@ const tag = "[TabView]";
  * 탭을 그리기 위한 탭 정보
  * @type {{KEYWORD: string, HISTORY: string}}
  */
-const TabType = {
+export const TabType = {
     KEYWORD: 'KEYWORD',
     HISTORY: 'HISTORY',
 }
@@ -27,15 +27,32 @@ const TabLabel = {
 
 }
 
+
 export default class TabView extends View {
     constructor() {
         console.log(tag, 'Tabview')
         super(qs('#tab-view'));
         this.template = new Template();
+        this.bindEvents();
     }
 
-    show() {
+    bindEvents() {
+        delegate(this.element, "click", "li", (event) => this.handleClick(event));
+    }
+
+    handleClick(event) {
+        console.log(tag, "handleClick", event.target.dataset.tab);
+
+        const value = event.target.dataset.tab;
+        this.emit("@change", { value });
+    }
+
+    show(selectedTab) {
         this.element.innerHTML = this.template.getList();
+        qsAll("li", this.element).forEach((li) => {
+            li.className = li.dataset.tab == selectedTab ? "active" : "";
+        });
+
         super.show();
     }
 }

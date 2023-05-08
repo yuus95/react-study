@@ -30,9 +30,9 @@ export function delegate(target, eventName, selector, handler) {
                 return handler.call(event.target, event);
             }
         }
+    };
 
-        on(target, eventName, emitEvent);
-    }
+    on(target, eventName, emitEvent);
 }
 
 export function emit(target, eventName, detail) {
