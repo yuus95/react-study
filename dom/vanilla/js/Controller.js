@@ -32,6 +32,7 @@ export default class Controller {
             .on("@reset", _ => this.reset())
 
         this.tabView.on("@change", (event) => this.changeTab(event.detail.value));
+        this.keywordListView.on("@click", (event) => this.search(event.detail.value));
     }
 
     search(keyword) {
@@ -42,14 +43,13 @@ export default class Controller {
     }
 
     reset() {
-        console.log("@reset");
+        this.store.search("");
+        this.render();
     }
 
     render() {
         if (this.store.searchKeyword.length > 0) {
-            this.tabView.hide();
-            this.searchResultView.show(this.store.searchResult)
-            return
+            return this.renderSearchResult();
         }
 
 
@@ -58,13 +58,16 @@ export default class Controller {
 
         if (this.store.selectedTab == TabType.KEYWORD) {
             this.keywordListView.show(this.store.keywordList())
-        } else if (this.store.selectedTab == TabType.HISTORY){
+        } else if (this.store.selectedTab == TabType.HISTORY) {
             console.log("History")
             this.keywordListView.hide();
         }
     }
 
     renderSearchResult() {
+        this.tabView.hide();
+        this.keywordListView.hide();
+
         this.searchFormView.show(this.store.searchKeyword);
         this.searchResultView.show(this.store.searchResult);
     }
