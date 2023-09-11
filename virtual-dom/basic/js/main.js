@@ -1,14 +1,35 @@
+import store from "./js/store.js";
+
 // status을 이용하여 어플리케이션 로직을 구현할 수 있다.
 // 컴포넌트 내부에서만 이용할 수 있다.
 
 
+const TabType = {
+    KEYWORD: 'KEYWORD',
+    HISTORY: 'HISTORY',
+}
+
+/**
+ * 출력용 레이블
+ * @type {{[p: string]: string}}
+ */
+const TabLabel = {
+    [TabType.KEYWORD]: "추천검색어",
+    [TabType.HISTORY]: "최근검색어"
+}
+
+
 // 리액트 컴포넌트를 이용하면 상태관리를 리액트에서 할 수 있다.
+// 변수값이 변경되었을 때, 화면를 동시에 변경할 수 있다.
 class App extends React.Component {
     constructor() {
         super();
         // 스테이트는 컴포넌트안에서만 만들 수 있다.
         this.state = {
             searchKeyword: "Hello",
+            searchResult: [],
+            submitted: false,
+            selectedTab: "KEYWORD"
         }
     }
 
@@ -18,15 +39,14 @@ class App extends React.Component {
 //         this.state.searchKeyword = event.target.value;
 //         this.forceUpdate()
 //     }
-
     handleChangeInput(event) {
         const searchKeyword = event.target.value;
 
-        if (searchKeyword.length <= 0) {
+        if (searchKeyword.length <= 0 && this.state.submitted) {
             return this.handleReset();
         }
 
-        // 리액트에서 제공하는 메소드 상태값 변경하고 forceUpdate를 하지 않아도 데이터와 뷰가 변경된다.
+        // 리액트에서 제공하는 메소드,  상태값을 변경하고 forceUpdate를 하지 않아도 데이터와 뷰가 변경된다.
         // setState는 비동기 방식으로 변경된다.
         this.setState({
             searchKeyword: searchKeyword
@@ -36,17 +56,31 @@ class App extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
         console.log('TODO: handleSubmit ', this.state.searchKeyword)
+        this.search(this.state.searchKeyword)
+    }
+
+    search(searchKeyword) {
+        const searchResult = store.search(searchKeyword)
+        this.setState({
+            searchResult,
+            submitted: true
+        })
     }
 
     handleReset() {
-        // setState는ㄴ 비동기이므로 콜백함수를 이용하여 동기처리
+        // setState는 비동기이므로 콜백함수를 이용하여 동기처리
         this.setState(
-            () => {
-                return {searchKeyword: ""};
-            },
-            () => {
-                console.log("TODO: handleReset", this.state.searchKeyword)
+            {
+                searchKeyword: "",
+                submitted: false,
             }
+            // () => {
+            //     return {searchKeyword: "",
+            //         submitted: false};
+            // },
+            // () => {
+            //     console.log("TODO: handleReset", this.state.searchKeyword)
+            // }
         )
     }
 
@@ -60,32 +94,74 @@ class App extends React.Component {
         //     resetButton = <button type="reset" className="btn-reset"></button>
         // }
 
+        // 엘리멘탈 변수를 이용하여 리팩토링 진행 (컴포넌트마다 분리)
+        const searchForm = (
+            <form onSubmit={event => this.handleSubmit(event)}
+                  onReset={() => this.handleReset()}>
+                {/*중괄호를 이용하여 자바스크립트 변수를 넣을 수 있다.*/}
+                <input type="text"
+                       name="form-input"
+                       placeholder="검색어를 입력하세요" autoFocus
+                       value={this.state.searchKeyword}
+                       onChange={event => this.handleChangeInput(event)}
+                />
+
+                {/*<button type="reset" className="btn-reset"></button>*/}
+
+                {/* 조건부 렌더링 삼항 연산 방식*/}
+                {/*{this.state.searchKeyword.length > 0 ?*/}
+                {/*    <button type="reset" className="btn-reset"></button> :*/}
+                {/*    null}*/}
+
+                {/* && 연산을 사용하는 방식*/}
+                {this.state.searchKeyword.length > 0 && <button type="reset" className="btn-reset"></button>}
+            </form>
+        )
+
+        const searchResult = (
+            (this.state.searchResult.length > 0
+                ? (<ul>
+                    {this.state.searchResult.map(item => {
+                        return (
+                            <li key={item.id}>
+                                <img src={item.imageUrl} alt={item.name}/>
+                                <p>{item.name}</p>
+                            </li>
+                        )
+                    })}
+                </ul>)
+
+                : (<div className="empty-box"> 검색 결과가 없습니다.</div>))
+        )
+
+        const tabs = (
+            <>
+                <ul className="tabs">
+                    {Object.values(TabType).map((tabType) => {
+                        return (<li key={tabType}
+                                    className={this.state.selectedTab === tabType ? 'active' : ''}
+                                    onClick={() => this.setState({selectedTab: tabType}) }>
+                                    {TabLabel[tabType]}
+                                </li>)
+                    })}
+                </ul>
+                {/* 화면을 분기 처리할 땐 삼항자 연산 + && */}
+                {this.state.selectedTab === TabType.KEYWORD && <>TODO: 추천 검색어</>}
+                {this.state.selectedTab === TabType.HISTORY && <>TODO: 최근 검색어</>}
+            </>
+        );
 
         return (
             <>
                 <header>
                     <h2 className="container">검색</h2>
                 </header>
-                <form onSubmit={event => this.handleSubmit(event)}
-                      onReset={() => this.handleReset()}>
-                    {/*중괄호를 이용하여 자바스크립트 변수를 넣을 수 있다.*/}
-                    <input type="text"
-                           name="form-input"
-                           placeholder="검색어를 입력하세요" autoFocus
-                           value={this.state.searchKeyword}
-                           onChange={event => this.handleChangeInput(event)}
-                    />
-
-                    {/*<button type="reset" className="btn-reset"></button>*/}
-
-                    {/* 조건부 렌더링 삼항 연산 방식*/}
-                    {/*{this.state.searchKeyword.length > 0 ?*/}
-                    {/*    <button type="reset" className="btn-reset"></button> :*/}
-                    {/*    null}*/}
-
-                    {/* && 연산을 사용하는 방식*/}
-                    {this.state.searchKeyword.length > 0 && <button type="reset" className="btn-reset"></button>}
-                </form>
+                <div className="container">
+                    {searchForm}
+                    <div className="content">
+                        {this.state.submitted == true ? searchResult : tabs}
+                    </div>
+                </div>
             </>
         );
     }

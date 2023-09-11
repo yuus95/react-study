@@ -24,7 +24,6 @@ export const TabType = {
 const TabLabel = {
     [TabType.KEYWORD]: "추천검색어",
     [TabType.HISTORY]: "최근검색어"
-
 }
 
 
