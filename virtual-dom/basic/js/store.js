@@ -20,7 +20,11 @@ class Store {
     }
 
     getHistoryList() {
-        return this.storage.historyData;
+        return this.storage.historyData.sort(this._sortHistory);
+    }
+
+    _sortHistory(history1, history2) {
+        return history2.date > history1.date;
     }
 }
 

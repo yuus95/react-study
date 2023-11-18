@@ -1,4 +1,5 @@
 import store from "./js/store.js";
+import {formatRelativeDate} from "./js/helpers.js";
 
 // status을 이용하여 어플리케이션 로직을 구현할 수 있다.
 // 컴포넌트 내부에서만 이용할 수 있다.
@@ -29,8 +30,21 @@ class App extends React.Component {
             searchKeyword: "Hello",
             searchResult: [],
             submitted: false,
-            selectedTab: "KEYWORD"
+            selectedTab: TabType.KEYWORD,
+            keywordList: [],
+            historyList: []
         }
+    }
+
+    // 컴포넌트가 마운트된 직후, 트리에 삽입된 직후에 호출한다.
+    // 화면이 만들어지기 전에 호출이 필요하다면 해당 함수를 사용해야 한다. 대신 render함수를 2번 호출하는 부분이라 성능이랑 연관이 있음.
+    componentDidMount() {
+        const keywordList = store.getKeywordList();
+        const historyList = store.getHistoryList();
+        this.setState({
+            keywordList,
+            historyList
+        });
     }
 
 // 리액트는 변경이 필요할 때만  랜더함수를 호출하여 값을 변경한다. 어떠한 변화가 일어났을 때 랜더함수를 호출하지 않으면
@@ -47,7 +61,7 @@ class App extends React.Component {
         }
 
         // 리액트에서 제공하는 메소드,  상태값을 변경하고 forceUpdate를 하지 않아도 데이터와 뷰가 변경된다.
-        // setState는 비동기 방식으로 변경된다.
+        // setState는 비동기 방식으로 변경된다.¡
         this.setState({
             searchKeyword: searchKeyword
         });
@@ -62,6 +76,7 @@ class App extends React.Component {
     search(searchKeyword) {
         const searchResult = store.search(searchKeyword)
         this.setState({
+            searchKeyword,
             searchResult,
             submitted: true
         })
@@ -86,6 +101,34 @@ class App extends React.Component {
 
     // 리엑트 앨리먼트를 반환하는 메소드
     render() {
+
+        const keywordList = (
+            <>
+                <ul className="list">
+                    {this.state.keywordList.map(({id, keyword}, index) => {
+                        return (
+                            <li key={id} onClick={() => this.search(keyword)}>
+                                <span className="number">{index + 1}</span>
+                                <span>{keyword}></span>
+                            </li>
+                        )
+                    })}
+                </ul>
+            </>
+        )
+
+        const historyList = (
+            <ul className="list">
+                {this.state.historyList.map(({ id, keyword, date }) => (
+                    <li key={id} onClick={() => this.search(keyword)}>
+                        <span>{keyword}</span>
+                        <span className="date">{formatRelativeDate(date)}</span>
+                        {/* TODO */}
+                        <button className="btn-remove" />
+                    </li>
+                ))}
+            </ul>
+        )
 
         // 조건부 렌더링 - 엘리멘트 변수 방식
         // let resetButton = null;
@@ -140,14 +183,14 @@ class App extends React.Component {
                     {Object.values(TabType).map((tabType) => {
                         return (<li key={tabType}
                                     className={this.state.selectedTab === tabType ? 'active' : ''}
-                                    onClick={() => this.setState({selectedTab: tabType}) }>
-                                    {TabLabel[tabType]}
-                                </li>)
+                                    onClick={() => this.setState({selectedTab: tabType})}>
+                            {TabLabel[tabType]}
+                        </li>)
                     })}
                 </ul>
                 {/* 화면을 분기 처리할 땐 삼항자 연산 + && */}
-                {this.state.selectedTab === TabType.KEYWORD && <>TODO: 추천 검색어</>}
-                {this.state.selectedTab === TabType.HISTORY && <>TODO: 최근 검색어</>}
+                {this.state.selectedTab === TabType.KEYWORD && keywordList}
+                {this.state.selectedTab === TabType.HISTORY && historyList}
             </>
         );
 
