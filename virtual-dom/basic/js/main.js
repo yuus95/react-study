@@ -4,6 +4,8 @@ import {formatRelativeDate} from "./js/helpers.js";
 // status을 이용하여 어플리케이션 로직을 구현할 수 있다.
 // 컴포넌트 내부에서만 이용할 수 있다.
 
+// 버블링이란??
+
 
 const TabType = {
     KEYWORD: 'KEYWORD',
@@ -99,6 +101,13 @@ class App extends React.Component {
         )
     }
 
+    handleClickRemoveHistory(event, keyword) {
+        event.stopPropagation();
+        store.removeHistory(keyword);
+        const historyList = store.getHistoryList();
+        this.setState({historyList})
+    }
+
     // 리엑트 앨리먼트를 반환하는 메소드
     render() {
 
@@ -119,12 +128,11 @@ class App extends React.Component {
 
         const historyList = (
             <ul className="list">
-                {this.state.historyList.map(({ id, keyword, date }) => (
+                {this.state.historyList.map(({id, keyword, date}) => (
                     <li key={id} onClick={() => this.search(keyword)}>
                         <span>{keyword}</span>
                         <span className="date">{formatRelativeDate(date)}</span>
-                        {/* TODO */}
-                        <button className="btn-remove" />
+                        <button className="btn-remove" onClick={(event) => this.handleClickRemoveHistory(event, keyword)}/>
                     </li>
                 ))}
             </ul>
