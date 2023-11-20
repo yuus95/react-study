@@ -50,6 +50,7 @@ export default class Controller {
         this.render();
     }
 
+    //화면을 처음부터 다그린다.
     render() {
         if (this.store.searchKeyword.length > 0) {
             return this.renderSearchResult();

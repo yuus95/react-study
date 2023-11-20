@@ -1,5 +1,5 @@
 import store from "./js/store.js";
-import {formatRelativeDate} from "./js/helpers.js";
+import { formatRelativeDate } from "./js/helpers.js";
 
 // status을 이용하여 어플리케이션 로직을 구현할 수 있다.
 // 컴포넌트 내부에서만 이용할 수 있다.
@@ -77,10 +77,12 @@ class App extends React.Component {
 
     search(searchKeyword) {
         const searchResult = store.search(searchKeyword)
+        const historyList = store.getHistoryList()
         this.setState({
             searchKeyword,
             searchResult,
-            submitted: true
+            submitted: true,
+            historyList
         })
     }
 
@@ -132,7 +134,8 @@ class App extends React.Component {
                     <li key={id} onClick={() => this.search(keyword)}>
                         <span>{keyword}</span>
                         <span className="date">{formatRelativeDate(date)}</span>
-                        <button className="btn-remove" onClick={(event) => this.handleClickRemoveHistory(event, keyword)}/>
+                        <button className="btn-remove"
+                                onClick={(event) => this.handleClickRemoveHistory(event, keyword)}/>
                     </li>
                 ))}
             </ul>

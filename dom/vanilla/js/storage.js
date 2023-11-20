@@ -1,4 +1,4 @@
-import {createPastDate} from "./helpers.js";
+import {createPastDate} from "./js/helpers.js";
 
 const storage = {
     keywordData: [
