@@ -1,10 +1,15 @@
 import React from "react";
+import Header from "./components/Header.js";
+import SearchForm from "./components/SearchForm"
+
 export default class App extends React.Component {
     render() {
         return (
-            <div>
-                Hello Sub Component
-            </div>
-        );
+            <>
+                <Header title="검색"/>
+                <SearchForm />
+            </>
+    )
+        ;
     }
 }
