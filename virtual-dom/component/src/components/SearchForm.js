@@ -9,11 +9,22 @@ export default class SearchForm extends React.Component {
         }
     }
 
+    //폼에 입력이벤트가 발생하면 서버에 데이터를 요청하는데 이벤트를 막는다.
+    //props 외부에서 받을 수 있고, 외부로 보낼 수 있다.
+    handleSubmit(event) {
+        event.preventDefault();
+        this.props.onSubmit(this.state.searchKeyword);
+    }
+
+    handleReset() {
+        this.props.onReset();
+    }
+
     handleChangeInput(event) {
         const searchKeyword = event.target.value;
 
-        if (searchKeyword.length <= 0 && this.state.submitted) {
-            return this.handleReset();
+        if (searchKeyword.length <= 0) {
+            this.handleReset();
         }
 
         // 리액트에서 제공하는 메소드,  상태값을 변경하고 forceUpdate를 하지 않아도 데이터와 뷰가 변경된다.
@@ -33,8 +44,6 @@ export default class SearchForm extends React.Component {
                        value={this.state.searchKeyword}
                        onChange={event => this.handleChangeInput(event)}
                 />
-
-                {/*<button type="reset" className="btn-reset"></button>*/}
 
                 {/* 조건부 렌더링 삼항 연산 방식*/}
                 {/*{this.state.searchKeyword.length > 0 ?*/}
