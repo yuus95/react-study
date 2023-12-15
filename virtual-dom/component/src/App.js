@@ -5,6 +5,7 @@ import SearchResult from "./components/SearchResult.js";
 import Store from "./store.js"
 import Tabs, {TabType} from "./components/Tabs.js"
 import KeywordList from "./components/KeywordList.js";
+import HistoryList from "./components/HistoryList.js";
 
 export default class App extends React.Component {
     constructor() {
@@ -21,13 +22,15 @@ export default class App extends React.Component {
     search(searchKeyword) {
         const searchResult = Store.search(searchKeyword);
         const submitted = true
-        this.setState({searchResult,submitted});
+        this.setState({searchResult, submitted});
     }
 
     reset() {
         const submitted = false;
-        this.setState({submitted,
-            searchResult:[]})
+        this.setState({
+            submitted,
+            searchResult: []
+        })
     }
 
     handleChangeInput(searchKeyword) {
@@ -41,7 +44,7 @@ export default class App extends React.Component {
     // 특정 컴포넌트의 스테이트를 다른 근처 컴포넌트에서도 사용할 경우,
     // 부모 컴포넌트로 끌어올리는게 올바른 방법이다.
     render() {
-        const {searchKeyword, submitted, searchResult,selectedTab} = this.state;
+        const {searchKeyword, submitted, searchResult, selectedTab} = this.state;
 
         return (
             <>
@@ -54,10 +57,14 @@ export default class App extends React.Component {
 
                 {submitted ?
                     <SearchResult data={searchResult}/> :
-                    <Tabs selectedTab= {selectedTab} onChange={(selectedTab) => {this.setState({selectedTab})}}/>}
-
-                {selectedTab === TabType.KEYWORD && <KeywordList />}
-                {selectedTab === TabType.HISTORY && <> TODO: 최근검색어 </>}
+                    <>
+                        <Tabs selectedTab={selectedTab} onChange={(selectedTab) => {
+                            this.setState({selectedTab})
+                        }}/>
+                        {selectedTab === TabType.KEYWORD && <KeywordList onClick={keyword => this.search(keyword)}/>}
+                        {selectedTab === TabType.HISTORY && <HistoryList onClick={keyword => this.search(keyword)}/>}
+                    </>
+                }
             </>
         )
             ;
