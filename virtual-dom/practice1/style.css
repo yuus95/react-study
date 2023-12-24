@@ -1,0 +1,25 @@
+body,
+ul {
+    maring: 0;
+    padding: 0;
+}
+
+ul {
+    list-style: none;
+}
+
+header {
+    border-bottom: 1px #ccc solid;
+    padding: 15px 0 15px 0;
+    text-align: center;
+}
+
+input[type=text] {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 15px 0 15px 0;
+    padding: 10px 15px;
+    font-size: 14px;
+    line-height: 1.5;
+}
